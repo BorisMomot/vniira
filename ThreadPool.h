@@ -46,7 +46,13 @@ public:
      * @param task задание на выполнение
      */
     template <typename F>
-    void pushTask(const F &task);
+    void pushTask(const F &task){
+            tasksTotal++;
+            {
+                const std::scoped_lock lock(queueMutex);
+                tasks.push(std::function<void()>(task));
+            }
+        }
 
     /**
      * @brief Добавить функцию в очередь выполнения
@@ -57,7 +63,10 @@ public:
      * @param args параметры функции
      */
     template <typename F, typename... A>
-    void pushTask(const F &task, const A &...args);
+    void pushTask(const F &task, const A &...args){
+        pushTask([task, args...] { task(args...); });
+    }
+
 
     /**
      * @brief Функция для ожидания завершения исполнения

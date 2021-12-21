@@ -25,19 +25,19 @@ std::uint_fast32_t ThreadPool::getTasksRunning() const {
     return tasksTotal - (std::uint_fast32_t) getTasksQueued();
 }
 
-template <typename F>
-void ThreadPool::pushTask(const F &task) {
-    tasksTotal++;
-    {
-        const std::scoped_lock lock(queueMutex);
-        tasks.push(std::function<void()>(task));
-    }
-}
+//template <typename F>
+//void ThreadPool::pushTask(const F &task) {
+//    tasksTotal++;
+//    {
+//        const std::scoped_lock lock(queueMutex);
+//        tasks.push(std::function<void()>(task));
+//    }
+//}
 
-template <typename F, typename... A>
-void ThreadPool::pushTask(const F &task, const A &...args) {
-    pushTask([task, args...] { task(args...); });
-}
+//template <typename F, typename... A>
+//void ThreadPool::pushTask(const F &task, const A &...args) {
+//    pushTask([task, args...] { task(args...); });
+//}
 
 void ThreadPool::waitForTasks() {
     while (true) {

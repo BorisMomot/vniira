@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "StrNumber.h"
+#include "ThreadPool.h"
 
 
 // Задание:
@@ -69,7 +70,7 @@ static std::tuple<int, std::string, size_t> parseArgs (int argc, char** argv){
     return std::make_tuple(ParseStatus::successContinue, fileName, bufferSize);
 }
 
-StrNumber getFirstNumber(const std::unique_ptr<char[]> &buffer, size_t bufReadSize){
+StrNumber getFirstNumber(std::shared_ptr<char[]> buffer, size_t bufReadSize){
     StrNumber readPartSum{0};
     std::string currentNumber;
 
@@ -103,7 +104,63 @@ StrNumber getFirstNumber(const std::unique_ptr<char[]> &buffer, size_t bufReadSi
     }
     return readPartSum;
 }
-std::pair<StrNumber, long long> processBuffer(const std::unique_ptr<char[]> &buffer, const size_t bufReadSize ) {
+
+//std::pair<StrNumber, long long> processBuffer(std::unique_ptr<char[]> &buffer, const size_t bufReadSize ) {
+//    StrNumber readPartSum{0};
+//    long long partXor{0};
+//
+//    std::string currentNumber;
+//
+//    for (int i = 0; i < bufReadSize; ++i) {
+//        if (buffer[i] == EOF) {break;}
+//
+//        // Проверяем что не число
+//        if ( !isdigit(buffer[i]) ){
+//            // если первый знак и он минус
+//            if (buffer[i] == '-' && currentNumber.empty()){
+//                currentNumber += buffer[i];
+//                continue;
+//            }
+//
+//            // Проверяем что нужно заканчивать число
+//            if ((buffer[i] == ' ' || buffer[i] == '\n' ) && !currentNumber.empty()){
+//                std::cout << "Result number: " << currentNumber << std::endl;
+//
+//                try {
+//                    readPartSum += stoll(currentNumber);
+//
+//                    partXor = ( partXor ^ stoll(currentNumber));
+//
+//                }catch (const std::exception exception){
+//                    std::cerr << exception.what() << " problem: " << currentNumber << std::endl;
+//                }
+//                currentNumber.clear();
+//                continue;
+//            } else{
+//                continue;
+//            }
+//        } else {
+//            currentNumber += buffer[i];
+//        }
+//    }
+//
+//    // clear buffer
+//    if(!currentNumber.empty()){
+//        std::cout << "Result number: " << currentNumber << std::endl;
+//        try {
+//            readPartSum += stoll(currentNumber);
+//            partXor = ( partXor ^ stoll(currentNumber));
+//
+//        }catch (const std::exception exception){
+//            std::cerr << exception.what() << " problem: " << currentNumber << std::endl;
+//        }
+//        currentNumber.clear();
+//    }
+//
+//    return std::make_pair(readPartSum, partXor);
+//}
+
+std::pair<StrNumber, long long> processBuffer(std::shared_ptr<char[]> &buffer, const size_t bufReadSize ) {
     StrNumber readPartSum{0};
     long long partXor{0};
 
@@ -158,6 +215,64 @@ std::pair<StrNumber, long long> processBuffer(const std::unique_ptr<char[]> &buf
     return std::make_pair(readPartSum, partXor);
 }
 
+class Accumulator{
+public:
+    Accumulator() {}
+
+    void addNumber(const StrNumber& number){
+        std::lock_guard<std::mutex> lockGuard(totalMutex);
+        totalSum += number;
+    }
+
+    void xorNumber(const long long number){
+        std::lock_guard<std::mutex> lockGuard(totalMutex);
+        totalXor ^= number;
+    }
+
+    const StrNumber &getFirstNumber1() const {
+        std::lock_guard<std::mutex> lockGuard(firstMutex);
+        return firstNumber;
+    }
+    void setFirstNumber(const StrNumber &firstNumber) {
+        std::lock_guard<std::mutex> lockGuard(firstMutex);
+        Accumulator::firstNumber = firstNumber;
+    }
+    const StrNumber &getTotalSum() const {
+        std::lock_guard<std::mutex> lockGuard(totalMutex);
+        return totalSum;
+    }
+    void setTotalSum(const StrNumber &totalSum) {
+        std::lock_guard<std::mutex> lockGuard(totalMutex);
+        Accumulator::totalSum = totalSum;
+    }
+    long long int getTotalXor() const {
+        std::lock_guard<std::mutex> lockGuard(xorMutex);
+        return totalXor;
+    }
+    void setTotalXor(long long int totalXor) {
+        std::lock_guard<std::mutex> lockGuard(xorMutex);
+        Accumulator::totalXor = totalXor;
+    }
+    StrNumber getSubract() const {
+        std::scoped_lock scopedLock{firstMutex, totalMutex};
+        return firstNumber + firstNumber - totalSum;
+    }
+
+    friend std::ostream &operator<<(std::ostream &os, const Accumulator &accumulator) {
+        os << "totalSum: " << accumulator.getTotalSum() << " totalSubract: " << accumulator.getSubract()  << " totalXor: " << accumulator.getTotalXor();
+        return os;
+    }
+
+private:
+    mutable std::mutex firstMutex;
+    StrNumber firstNumber{0};
+    mutable std::mutex totalMutex;
+    StrNumber totalSum{0};
+    mutable std::mutex xorMutex;
+    long long totalXor{0};
+};
+
+
 int main(int argc, char** argv) {
     // Парсим ввод
     auto pResult = parseArgs(argc, argv);
@@ -169,42 +284,34 @@ int main(int argc, char** argv) {
     auto fileName = std::get<1>(pResult);
     auto bufferSize = std::get<2>(pResult);
 
+    Accumulator accumulator;
+
     std::ifstream bigFile(fileName);
+    std::shared_ptr<char[]> buffer(new char[bufferSize]);
 
-    std::unique_ptr<char[]> buffer(new char[bufferSize]);
     if (bigFile){
         bigFile.read(buffer.get(), bufferSize);
-        bigFile.clear();
-        bigFile.seekg(0);
-
-    }
-
-
-    StrNumber firstNumber = 0;
-    StrNumber totalSum = 0;
-    long long totalXor = 0;
-    if (bigFile){
-        bigFile.read(buffer.get(), bufferSize);
-        firstNumber = getFirstNumber(buffer, bigFile.gcount());
+        accumulator.setFirstNumber(getFirstNumber(buffer, bigFile.gcount()) ) ;
         bigFile.clear();
         bigFile.seekg(0);
     }
+
+    ThreadPool threadPool(2);
+
+    const auto prBuffer = [&accumulator] (std::shared_ptr<char[]> buffer, size_t bufReadSize) {
+        auto result = processBuffer( buffer, bufReadSize);
+        accumulator.addNumber(result.first);
+        accumulator.xorNumber(result.second);
+    };
 
     while (bigFile) {
         bigFile.read(buffer.get(), bufferSize);
-        auto result = processBuffer(buffer, bigFile.gcount());
-        totalSum += result.first;
-        totalXor ^= result.second;
+        threadPool.pushTask(prBuffer, buffer, bigFile.gcount());
     }
-    std::cout << "First number: " << firstNumber << std::endl;
-    std::cout << "Total sum: " << totalSum - firstNumber << std::endl;
-    std::cout << "Total dif: " << firstNumber + firstNumber - totalSum  << std::endl;
-    std::cout << "Total xor: " << totalXor << std::endl;
 
-
+    threadPool.waitForTasks();
+    std::cout << accumulator << std::endl;
     return EXIT_SUCCESS;
 }
-
-
 
 
