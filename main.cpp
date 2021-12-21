@@ -7,6 +7,8 @@
 #include <cmath>
 #include <vector>
 
+#include "StrNumber.h"
+
 
 // Задание:
 // Есть многострочный текстовый файл с числами, записанными через пробел. Его размер
@@ -67,6 +69,94 @@ static std::tuple<int, std::string, size_t> parseArgs (int argc, char** argv){
     return std::make_tuple(ParseStatus::successContinue, fileName, bufferSize);
 }
 
+StrNumber getFirstNumber(const std::unique_ptr<char[]> &buffer, size_t bufReadSize){
+    StrNumber readPartSum{0};
+    std::string currentNumber;
+
+    for (int i = 0; i < bufReadSize; ++i) {
+        if (buffer[i] == EOF) {break;}
+        // Проверяем что не число
+        if ( !isdigit(buffer[i]) ){
+            // если первый знак и он минус
+            if (buffer[i] == '-' && currentNumber.empty()){
+                currentNumber += buffer[i];
+                continue;
+            }
+            // Проверяем что нужно заканчивать число
+            if ((buffer[i] == ' ' || buffer[i] == '\n' ) && !currentNumber.empty()){
+                readPartSum = StrNumber(currentNumber);
+
+                return readPartSum;
+            } else{
+                continue;
+            }
+        } else {
+            currentNumber += buffer[i];
+        }
+    }
+
+    // Если число первое, оно же единственное
+    if(!currentNumber.empty()){
+        std::cout << "Result number: " << currentNumber << std::endl;
+        readPartSum = StrNumber(currentNumber);
+        return readPartSum;
+    }
+    return readPartSum;
+}
+std::pair<StrNumber, long long> processBuffer(const std::unique_ptr<char[]> &buffer, const size_t bufReadSize ) {
+    StrNumber readPartSum{0};
+    long long partXor{0};
+
+    std::string currentNumber;
+
+    for (int i = 0; i < bufReadSize; ++i) {
+        if (buffer[i] == EOF) {break;}
+
+        // Проверяем что не число
+        if ( !isdigit(buffer[i]) ){
+            // если первый знак и он минус
+            if (buffer[i] == '-' && currentNumber.empty()){
+                currentNumber += buffer[i];
+                continue;
+            }
+
+            // Проверяем что нужно заканчивать число
+            if ((buffer[i] == ' ' || buffer[i] == '\n' ) && !currentNumber.empty()){
+                std::cout << "Result number: " << currentNumber << std::endl;
+
+                try {
+                    readPartSum += stoll(currentNumber);
+
+                    partXor = ( partXor ^ stoll(currentNumber));
+
+                }catch (const std::exception exception){
+                    std::cerr << exception.what() << " problem: " << currentNumber << std::endl;
+                }
+                currentNumber.clear();
+                continue;
+            } else{
+                continue;
+            }
+        } else {
+            currentNumber += buffer[i];
+        }
+    }
+
+    // clear buffer
+    if(!currentNumber.empty()){
+        std::cout << "Result number: " << currentNumber << std::endl;
+        try {
+            readPartSum += stoll(currentNumber);
+            partXor = ( partXor ^ stoll(currentNumber));
+
+        }catch (const std::exception exception){
+            std::cerr << exception.what() << " problem: " << currentNumber << std::endl;
+        }
+        currentNumber.clear();
+    }
+
+    return std::make_pair(readPartSum, partXor);
+}
 
 int main(int argc, char** argv) {
     // Парсим ввод
@@ -90,5 +180,31 @@ int main(int argc, char** argv) {
     }
 
 
+    StrNumber firstNumber = 0;
+    StrNumber totalSum = 0;
+    long long totalXor = 0;
+    if (bigFile){
+        bigFile.read(buffer.get(), bufferSize);
+        firstNumber = getFirstNumber(buffer, bigFile.gcount());
+        bigFile.clear();
+        bigFile.seekg(0);
+    }
+
+    while (bigFile) {
+        bigFile.read(buffer.get(), bufferSize);
+        auto result = processBuffer(buffer, bigFile.gcount());
+        totalSum += result.first;
+        totalXor ^= result.second;
+    }
+    std::cout << "First number: " << firstNumber << std::endl;
+    std::cout << "Total sum: " << totalSum - firstNumber << std::endl;
+    std::cout << "Total dif: " << firstNumber + firstNumber - totalSum  << std::endl;
+    std::cout << "Total xor: " << totalXor << std::endl;
+
+
     return EXIT_SUCCESS;
 }
+
+
+
+
