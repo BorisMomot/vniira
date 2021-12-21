@@ -3,4 +3,5 @@ project(vniira)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(vniira main.cpp StrNumber.h StrNumber.cc)
+add_executable(vniira main.cpp StrNumber.h StrNumber.cc ThreadPool.h ThreadPool.cc ArgParser.h ResultAccumulator.h BufferProcessors.h)
+target_link_libraries(vniira pthread)
