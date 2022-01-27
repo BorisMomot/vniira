@@ -1,0 +1,11 @@
+extensions = [ "breathe", "m2r2" ]
+breathe_projects = { "VNIIRA": "@CMAKE_CURRENT_BINARY_DIR@/xml" }
+breathe_default_project = "VNIIRA"
+
+project = "VNIIRA test project"
+author = "Boris Momot"
+copyright = "2022, Authors"
+version = "@PROJECT_VERSION@"
+release = "@PROJECT_VERSION@"
+
+html_theme = 'sphinx_rtd_theme'

@@ -1,0 +1,4 @@
+add_executable(buffer_processor_test buffer_processor_test.cc)
+target_link_libraries(buffer_processor_test PRIVATE gtest_main strNumber)
+target_include_directories(buffer_processor_test PRIVATE ${PROJECT_SOURCE_DIR}/include)
+gtest_discover_tests(buffer_processor_test)

@@ -6,10 +6,10 @@
 #include <cmath>
 #include <vector>
 
-#include "ArgParser.h"
-#include "BufferProcessors.h"
-#include "ResultAccumulator.h"
-#include "ThreadPool.h"
+#include "arg_parser/ArgParser.h"
+#include "buffer_processor/BufferProcessors.h"
+#include "result_accumulator/ResultAccumulator.h"
+#include "thread_pool/ThreadPool.h"
 
 
 // Задание:
