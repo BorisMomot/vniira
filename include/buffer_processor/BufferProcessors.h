@@ -5,7 +5,7 @@
 #ifndef VNIIRA_BUFFERPROCESSORS_H
 #define VNIIRA_BUFFERPROCESSORS_H
 
-#include "StrNumber.h"
+#include "str_number/StrNumber.h"
 
 /**
  * Исключение на случай недопустимых чисел в последовательности

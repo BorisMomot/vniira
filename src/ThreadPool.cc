@@ -2,7 +2,7 @@
 // Created by boris on 21.12.2021.
 //
 
-#include "ThreadPool.h"
+#include "thread_pool/ThreadPool.h"
 
 ThreadPool::ThreadPool(const std::uint_fast32_t &_thread_count)
         : threadCount(_thread_count ? _thread_count : std::thread::hardware_concurrency()), threads(new std::thread[_thread_count ? _thread_count : std::thread::hardware_concurrency()])

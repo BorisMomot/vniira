@@ -4,7 +4,7 @@
 
 #ifndef VNIIRA_RESULTACCUMULATOR_H
 #define VNIIRA_RESULTACCUMULATOR_H
-#include "StrNumber.h"
+#include "str_number/StrNumber.h"
 #include <memory>
 #include <mutex>
 

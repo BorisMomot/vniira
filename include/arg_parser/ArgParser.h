@@ -10,6 +10,7 @@ enum ParseStatus{
     successStop = 1,
     successContinue = 2
 };
+
 static void printHelp(std::string name){
     std::cerr << "Usage: " << name << " <option(s)> SOURCES\n"
               << "Options:\n"
@@ -18,6 +19,7 @@ static void printHelp(std::string name){
               << "\t-b,--buffer \tSpecify reading buffer size (default: 1024 x 1024)"
               << std::endl;
 }
+
 static std::tuple<int, std::string, size_t> parseArgs (int argc, char** argv){
     std::string fileName;
     size_t bufferSize = 1024 * 1024;
