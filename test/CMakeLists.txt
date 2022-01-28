@@ -34,6 +34,6 @@ set_tests_properties(numbers PROPERTIES
         PASS_REGULAR_EXPRESSION "totalSum: 2758646078950 totalSubtract: -2751738516022 totalXor: 240293890")
 #-----------------------------------------------------------------------------------------------------------------------
 # 5. Пример из задания с маленьким буфером
-add_test(NAME numbers_small_buffer COMMAND ${TEST_PROGRAM} -b 10485 -f ${TEST_DATA_DIR}/numbers.txt)
+add_test(NAME numbers_small_buffer COMMAND ${TEST_PROGRAM} -b 100 -f ${TEST_DATA_DIR}/numbers.txt)
 set_tests_properties(numbers_small_buffer PROPERTIES
         PASS_REGULAR_EXPRESSION "totalSum: 2758646078950 totalSubtract: -2751738516022 totalXor: 240293890")

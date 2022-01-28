@@ -5,6 +5,7 @@
 #include <sstream>
 #include <cmath>
 #include <vector>
+#include <cstring>
 
 #include "arg_parser/ArgParser.h"
 #include "buffer_processor/BufferProcessors.h"
@@ -37,7 +38,7 @@ int main(int argc, char** argv) {
 
     // Читаем файл
     std::ifstream bigFile(fileName);
-    std::shared_ptr<char[]> buffer(new char[bufferSize]);
+    std::shared_ptr<char[]> buffer(new char[bufferSize * 2]);
 
     // Вычисляем первое число в последовательности
     if (bigFile){
@@ -60,7 +61,14 @@ int main(int argc, char** argv) {
 
     while (bigFile) {
         bigFile.read(buffer.get(), bufferSize);
-        threadPool.pushTask(prBuffer, buffer, bigFile.gcount());
+        size_t firstRead = bigFile.gcount();
+        bigFile.getline(buffer.get() + firstRead, bufferSize, ' ');
+        size_t secondRead = bigFile.gcount();
+        if (secondRead > bufferSize) { throw std::runtime_error("Buffer overflow");}
+
+        std::shared_ptr<char[]> buffer_copy(new char[firstRead + secondRead]);
+        std::memmove(buffer_copy.get(), buffer.get(), firstRead + secondRead);
+        threadPool.pushTask(prBuffer, buffer_copy, firstRead + secondRead);
     }
 
     threadPool.waitForTasks();
