@@ -2,7 +2,7 @@
 // Created by boris on 21.12.2021.
 //
 
-#include "str_number/StrNumber.h"
+#include "str_number/str_number.h"
 #include <sstream>
 #include <iostream>
 

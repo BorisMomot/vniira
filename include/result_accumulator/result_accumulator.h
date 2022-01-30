@@ -2,9 +2,9 @@
 // Created by boris on 21.12.2021.
 //
 
-#ifndef VNIIRA_RESULTACCUMULATOR_H
-#define VNIIRA_RESULTACCUMULATOR_H
-#include "str_number/StrNumber.h"
+#ifndef VNIIRA_RESULT_ACCUMULATOR_H
+#define VNIIRA_RESULT_ACCUMULATOR_H
+#include "str_number/str_number.h"
 #include <memory>
 #include <mutex>
 
@@ -65,4 +65,4 @@ private:
     long long totalXor{0};
 };
 
-#endif//VNIIRA_RESULTACCUMULATOR_H
+#endif // VNIIRA_RESULT_ACCUMULATOR_H

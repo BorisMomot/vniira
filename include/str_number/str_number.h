@@ -2,8 +2,8 @@
 // Created by boris on 21.12.2021.
 //
 
-#ifndef VNIIRA_STRNUMBER_H
-#define VNIIRA_STRNUMBER_H
+#ifndef VNIIRA_STR_NUMBER_H
+#define VNIIRA_STR_NUMBER_H
 
 #include <vector>
 #include <string>
@@ -99,4 +99,4 @@ private:
 
 
 
-#endif//VNIIRA_STRNUMBER_H
+#endif // VNIIRA_STR_NUMBER_H
