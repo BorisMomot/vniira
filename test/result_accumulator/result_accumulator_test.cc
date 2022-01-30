@@ -1,8 +1,8 @@
 //
 // Created by boris on 27.01.2022.
 //
-#include "result_accumulator/ResultAccumulator.h"
-#include "str_number/StrNumber.h"
+#include "result_accumulator/result_accumulator.h"
+#include "str_number/str_number.h"
 #include <future>
 #include <gtest/gtest.h>
 #include <limits>

@@ -1,31 +1,11 @@
 //
-// Created by boris on 21.12.2021.
+// Created by boris on 30.01.2022.
 //
+#include <buffer_processor/buffer_processors.h>
+#include <str_number/str_number.h>
+#include <memory>
 
-#ifndef VNIIRA_BUFFERPROCESSORS_H
-#define VNIIRA_BUFFERPROCESSORS_H
-
-#include "str_number/StrNumber.h"
-
-/**
- * Исключение на случай недопустимых чисел в последовательности
- */
-struct UnAcceptableNumber: public std::exception{
-    std::string message;
-    UnAcceptableNumber(const std::string &message) : message(message) {}
-    ~UnAcceptableNumber() throw() {}
-    const char *what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_USE_NOEXCEPT override {
-        return message.c_str();
-    }
-};
-
-/**
- * Возвращает первое число в последовательности
- * @param buffer - считанные символы
- * @param bufReadSize - количество считанных символов
- * @return - первое число
- */
-StrNumber getFirstNumber(std::shared_ptr<char[]> buffer, size_t bufReadSize){
+StrNumber getFirstNumber(std::shared_ptr<char[]> buffer, size_t bufReadSize) {
     StrNumber readPartSum{0};
     std::string currentNumber;
 
@@ -59,12 +39,7 @@ StrNumber getFirstNumber(std::shared_ptr<char[]> buffer, size_t bufReadSize){
     }
     return readPartSum;
 }
-/**
- * Вычисляет сумму и xor для последовательности чисел
- * @param buffer - считанные символы
- * @param bufReadSize - количество считанных символов
- * @return сумма чисел и результат xor
- */
+
 std::pair<StrNumber, long long> processBuffer(std::shared_ptr<char[]> &buffer, const size_t bufReadSize ) {
     StrNumber readPartSum{0};
     long long partXor{0};
@@ -114,4 +89,3 @@ std::pair<StrNumber, long long> processBuffer(std::shared_ptr<char[]> &buffer, c
     }
     return std::make_pair(readPartSum, partXor);
 }
-#endif//VNIIRA_BUFFERPROCESSORS_H

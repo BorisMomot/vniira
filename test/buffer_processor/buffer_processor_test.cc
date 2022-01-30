@@ -2,8 +2,8 @@
 // Created by boris on 26.01.2022.
 //
 #include <gtest/gtest.h>
-#include "buffer_processor/BufferProcessors.h"
-#include "str_number/StrNumber.h"
+#include "buffer_processor/buffer_processors.h"
+#include "str_number/str_number.h"
 #include <limits>
 
 std::shared_ptr<char[]> getStrBuffer(const std::string& str){

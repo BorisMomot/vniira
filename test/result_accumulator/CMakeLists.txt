@@ -1,4 +1,4 @@
 add_executable(result_accumulator_test result_accumulator_test.cc)
-target_link_libraries(result_accumulator_test PRIVATE gtest_main strNumber)
+target_link_libraries(result_accumulator_test PRIVATE gtest_main str_number)
 target_include_directories(result_accumulator_test PRIVATE ${PROJECT_SOURCE_DIR}/include)
 gtest_discover_tests(result_accumulator_test)

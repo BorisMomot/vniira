@@ -1,0 +1,3 @@
+add_library(buffer_processor buffer_processor.cc)
+target_include_directories(buffer_processor PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_link_libraries(buffer_processor pthread)

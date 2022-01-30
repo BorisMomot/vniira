@@ -7,6 +7,7 @@ add_subdirectory(buffer_processor)
 add_subdirectory(result_accumulator)
 add_subdirectory(str_number)
 add_subdirectory(thread_pool)
+add_subdirectory(buffer_pool)
 
 enable_testing()
 # Интеграционные тесты

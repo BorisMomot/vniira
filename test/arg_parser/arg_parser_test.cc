@@ -2,7 +2,7 @@
 // Created by boris on 26.01.2022.
 //
 #include <gtest/gtest.h>
-#include "arg_parser/ArgParser.h"
+#include "arg_parser/arg_parser.h"
 
 TEST(arg_parser, help_no_param){
     char* args[]={

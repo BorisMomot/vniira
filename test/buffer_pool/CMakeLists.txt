@@ -1,0 +1,4 @@
+add_executable(buffer_pool_test buffer_pool_test.cc)
+target_link_libraries(buffer_pool_test PRIVATE gtest_main PRIVATE str_number buffer_pool)
+target_include_directories(buffer_pool_test PRIVATE ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/src)
+gtest_discover_tests(buffer_pool_test)

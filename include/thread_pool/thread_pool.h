@@ -2,8 +2,8 @@
 // Created by boris on 21.12.2021.
 //
 
-#ifndef VNIIRA_THREADPOOL_H
-#define VNIIRA_THREADPOOL_H
+#ifndef VNIIRA_THREAD_POOL_H
+#define VNIIRA_THREAD_POOL_H
 
 #include <atomic>
 #include <chrono>
@@ -21,8 +21,7 @@
 
 class ThreadPool {
 public:
-
-    ThreadPool(const std::uint_fast32_t &_thread_count = std::thread::hardware_concurrency());
+  ThreadPool(const std::uint_fast32_t &_thread_count = std::thread::hardware_concurrency());
     virtual ~ThreadPool();
 
     /**
@@ -99,4 +98,4 @@ private:
 };
 
 
-#endif//VNIIRA_THREADPOOL_H
+#endif // VNIIRA_THREAD_POOL_H
