@@ -11,6 +11,7 @@
 #include "buffer_processor/BufferProcessors.h"
 #include "result_accumulator/ResultAccumulator.h"
 #include "thread_pool/ThreadPool.h"
+#include "buffer_pool/buffer_pool.h"
 
 
 // Задание:
@@ -52,11 +53,13 @@ int main(int argc, char** argv) {
     }
 
     ThreadPool threadPool(2);
+    BufferPool bufferPool(bufferSize * 2, 20, true);
 
-    const auto prBuffer = [&accumulator] (std::shared_ptr<char[]> buffer, size_t bufReadSize) {
+    const auto prBuffer = [&accumulator, &bufferPool] (std::shared_ptr<char[]> buffer, size_t bufReadSize) {
         auto result = processBuffer( buffer, bufReadSize);
         accumulator.addNumber(result.first);
         accumulator.xorNumber(result.second);
+        bufferPool.returnBuffer(buffer);
     };
 
     while (bigFile) {
@@ -66,7 +69,7 @@ int main(int argc, char** argv) {
         size_t secondRead = bigFile.gcount();
         if (secondRead > bufferSize) { throw std::runtime_error("Buffer overflow");}
 
-        std::shared_ptr<char[]> buffer_copy(new char[firstRead + secondRead]);
+        auto buffer_copy = bufferPool.getBuffer();
         std::memmove(buffer_copy.get(), buffer.get(), firstRead + secondRead);
         threadPool.pushTask(prBuffer, buffer_copy, firstRead + secondRead);
     }
