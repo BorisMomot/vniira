@@ -58,15 +58,13 @@ int main(int argc, char** argv) {
 
     // Основной цикл чтения и обработки
     while (bigFile) {
-        bigFile.read(buffer.get(), bufferSize);
+        auto buf = bufferPool.getBuffer();
+        bigFile.read(buf.get(), bufferSize);
         size_t firstRead = bigFile.gcount();
-        bigFile.getline(buffer.get() + firstRead, bufferSize, ' ');
+        bigFile.getline(buf.get() + firstRead, bufferSize, ' ');
         size_t secondRead = bigFile.gcount();
         if (secondRead > bufferSize) { throw std::runtime_error("Buffer overflow");}
-
-        auto buffer_copy = bufferPool.getBuffer();
-        std::memmove(buffer_copy.get(), buffer.get(), firstRead + secondRead);
-        threadPool.pushTask(prBuffer, buffer_copy, firstRead + secondRead);
+        threadPool.pushTask(prBuffer, buf, firstRead + secondRead);
     }
 
     threadPool.waitForTasks();
